@@ -1,12 +1,7 @@
 <template>
   <div id="app">
-<!--    <img alt="Vue logo" src="./assets/logo.png">-->
-<!--    <HelloWorld msg="Welcome to Your Vue.js App"/>-->
-
     <div class="mygutter" style="display: flex; flex-wrap: wrap">
-      <div @click="playMusic(i)" class="mykey one" v-for="i in 7" :key="i">L{{ i }}</div>
-      <div @click="playMusic(i + 7)" class="mykey two" v-for="i in 7" :key="i + 7">{{ i }}</div>
-      <div @click="playMusic(i + 14)" class="mykey three" v-for="i in 7" :key="i + 14">H{{ i }}</div>
+      <div @click="playMusic(i - 1)" class="mykey one" v-for="i in 21" :key="i">{{ tags[i - 1] }}</div>
     </div>
 
     <div class="mygutter" style="padding-top: 20px">
@@ -18,7 +13,6 @@
       <button @click="showAns">答案</button>
     </div>
     <p>{{ answer }}</p>
-
   </div>
 </template>
 
@@ -32,9 +26,15 @@ export default {
   },
   data(){
     this.ctx = new AudioContext()
-    this.sounds = [130, 147, 165, 175, 196, 220, 246,
-      262, 294, 330, 349, 392, 440, 494,
-      523, 587, 659, 698, 784, 880, 988]
+    this.sounds = [
+        147, 165, 175, 196, 220, 246, 262,
+      294, 330, 349, 392, 440, 494, 523,
+      587, 659, 698, 784, 880, 988, 1047]
+    this.tags = [
+        "L1", "L2", "L3", "L4", "L5", "L6", "L7",
+        "1", "2", "3", "4", "5", "6", "7",
+        "H1", "H2", "H3", "H4", "H5", "H6", "H7",
+    ]
     return {
       num: 4,
       seq: [],
@@ -43,15 +43,11 @@ export default {
   },
   methods: {
     playMusic(index) {
-      index = index - 1
-
       var osc = this.ctx.createOscillator()		  //获得音频振荡器
       var g = this.ctx.createGain()				 //获得音量控制器
       osc.connect(g)						//连接音量控制器
       osc.type = 'sine'						//设置波形
       osc.frequency.value = this.sounds[index] 	  //对应钢琴不同键的不同频率
-      console.log(index);
-      console.log(osc.frequency.value);
       var duration = 1						//控制时间
       g.connect(this.ctx.destination)			 //连接扬声器
       g.gain.value = 0						//初始音高为0
@@ -65,12 +61,10 @@ export default {
       let arr = []
       for(let i = 0; i < this.num; i++){
         let n = parseInt(Math.random() * this.sounds.length)
-        console.log(this.sounds.length)
         arr = arr.concat(n)
         this.seq = arr
       }
       console.log(arr)
-
     },
     playSeq() {
       let ref = this
@@ -81,15 +75,9 @@ export default {
       }
     },
     showAns() {
-      let ans = ''
-      for(let i = 0; i < this.seq.length; i++){
-        if( this.seq[i] < 7 ){
-          ans += "L"
-        }
-        if( this.seq[i] >= 14){
-          ans += "H"
-        }
-        ans += (this.seq[i] % 7 + 1) + " "
+      let ans = ""
+      for (let num of this.seq) {
+        ans += this.tags[num] + " "
       }
       this.answer = ans
     }
